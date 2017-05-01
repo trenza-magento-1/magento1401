@@ -1,0 +1,22 @@
+How to fix Php 5.6 deprecated messages in Magento
+
+I know, that Magento officially does not support Php 5.6, but as you may know, the latest version of Php (right now 5.6.1) comes with a lots of new features and optimizations, which could be handy. But those nasty deprecated messages “Deprecated functionality: iconv_set_encoding(): Use of iconv.internal_encoding is deprecated” fills Magento’s logs, right?
+There is a temporary solution for this, simply we just have to override some core files of Magento (well, they are core Zend Framework files). Here are the steps to follow:
+1. Create the following folders:
+/app/code/local/Zend/Locale
+/app/code/local/Zend/Service
+/app/code/local/Zend/Validate
+/app/code/local/Zend/XmlRpc
+
+2. Copy the following files from /lib/Zend/ to /app/code/local/Zend/:
+Locale/Format.php
+Service/Audioscrobbler.php
+Service/Technorati.php
+Validate/Hostname.php
+Validate/StringLength.php
+XmlRpc/Client.php
+3. Open the files from /app/code/local/Zend/ in a text editor and search for “internal_encoding” and replace them with “default_charset”. Before doing this, make sure that the “internal_encoding” string is a parameter of an iconv related function. Don’t replace “mb_internal_encoding”, “$internal_encoding” or any other non iconv related stuff, because it will break the code.
+
+This solution is for Magento 1.8, but it should be very similar for 1.9 as well. If you are not sure, just search in all files for “internal_encoding” and do the three steps above for the needed files.
+
+That’s all. Easy, isn’t it?
